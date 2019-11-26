@@ -15,7 +15,7 @@ class NewVisitorTest(unittest.TestCase): #1
         self.browser.get('http://localhost:8000')
 
         # 웹 페이지 타이틀과 헤더가 'To-Do'를 표시하고있다.
-        self.assertIn('To-do', self.browser.title) #5 aseertEqul, True, False도 있음
+        self.assertIn('To-Do', self.browser.title) #5 aseertEqul, True, False도 있음
         self.fail('Finish the test!') #6 강제로 테스트 실패 발생?
 
 if __name__ == '__main__': #7
