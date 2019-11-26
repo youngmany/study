@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import unittest
 
 class NewVisitorTest(unittest.TestCase): #1
@@ -16,20 +17,35 @@ class NewVisitorTest(unittest.TestCase): #1
 
         # 웹 페이지 타이틀과 헤더가 'To-Do'를 표시하고있다.
         self.assertIn('To-Do', self.browser.title) #5 aseertEqul, True, False도 있음
-        self.fail('Finish the test!') #6 강제로 테스트 실패 발생?
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
 
-if __name__ == '__main__': #7
-    unittest.main(warnings='ignore') #8
+        # 작업 추가
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'),
+            '작업 아이템 입력'
+        )
 
-    # 작업 추가
+        # "공작깃털 사기"라고 텍스트 상자에 입력
+        # (취미는 날치 잡이용 그물 만들기)
+        inputbox.send_keys('공작깃털 사기')
 
-    # 텍스트 상자에 입력
-    # (취미는 날치 잡이용 그물 만들기)
+        # 엔터키를 치면 페이지가 갱신되고, 작업 목록에
+        # 1. 공작깃털 사기 추가
+        inputbox.send_keys(Keys.ENTER)
 
-    # 엔터키를 치면 페이지가 갱신되고, 작업 목록에
-    # 1. 블라블라
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(
+            any(row.text == '1: 공작 깃털 사기' for row in rows),
+        )
+        
+        # 추가 아이템을 입력할 수 있는 여분의 텍스트 상자 존재
+        # 다시 "그물만들기" 입력
+        self.fail('Finish the test!')
 
-    # 추가 아이템을 입력할 수 있는 여분의 텍스트 상자 존재
-    # 다시 "그물만들기" 입력
+        # 페이지 리로딩, 아이템 2개 목록에 출력
 
-    # 페이지 리로딩, 아이템 2개 목록에 출력
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')
