@@ -11,6 +11,12 @@ class NewVisitorTest(unittest.TestCase): #1
     def tearDown(self): #3 시작후
         self.browser.quit()
 
+    # Helper Method
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+
     def test_can_start_a_list_and_retrieve_it_later(self): #4
         # Web Site 확인
         self.browser.get('http://localhost:8000')
@@ -30,14 +36,8 @@ class NewVisitorTest(unittest.TestCase): #1
         # "공작깃털 사기"라고 텍스트 상자에 입력
         # (취미는 날치 잡이용 그물 만들기)
         inputbox.send_keys('공작깃털 사기')
-
-        # 엔터키를 치면 페이지가 갱신되고, 작업 목록에
-        # 1. 공작깃털 사기 추가
         inputbox.send_keys(Keys.ENTER)
-    
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: 공작깃털 사기', [row.text for row in rows])
+        self.check_for_row_in_list_table('1: 공작깃털 사기')
         
         # 추가 아이템을 입력할 수 있는 여분의 텍스트 상자 존재
         inputbox = self.browser.find_element_by_id('id_new_item')
@@ -45,10 +45,8 @@ class NewVisitorTest(unittest.TestCase): #1
         inputbox.send_keys(Keys.ENTER)
 
         # 페이지 리로딩, 아이템 2개 목록에 출력
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: 공작깃털 사기', [row.text for row in rows])
-        self.assertIn('2: 공작깃털을 이용해서 그물 만들기', [row.text for row in rows])
+        self.check_for_row_in_list_table('2: 공작깃털을 이용해서 그물 만들기')
+        self.check_for_row_in_list_table('1: 공작깃털 사기')
 
         self.fail('Finish the test!')
 
