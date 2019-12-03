@@ -1,8 +1,9 @@
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
 
-class NewVisitorTest(unittest.TestCase): #1
+class NewVisitorTest(LiveServerTestCase): #1
 
     def setUp(self): #2 시작전
         self.browser = webdriver.Chrome(executable_path='/Users/ymkim/Downloads/chromedriver')
@@ -19,7 +20,7 @@ class NewVisitorTest(unittest.TestCase): #1
 
     def test_can_start_a_list_and_retrieve_it_later(self): #4
         # Web Site 확인
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # 웹 페이지 타이틀과 헤더가 'To-Do'를 표시하고있다.
         self.assertIn('To-Do', self.browser.title) #5 aseertEqul, True, False도 있음
@@ -52,5 +53,5 @@ class NewVisitorTest(unittest.TestCase): #1
 
         # 페이지 리로딩, 아이템 2개 목록에 출력
 
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+# if __name__ == '__main__':
+#    unittest.main(warnings='ignore')
