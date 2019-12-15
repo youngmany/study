@@ -25,7 +25,7 @@ class NewVisitorTest(LiveServerTestCase): #1
         # 웹 페이지 타이틀과 헤더가 'To-Do'를 표시하고있다.
         self.assertIn('To-Do', self.browser.title) #5 aseertEqul, True, False도 있음
         header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertIn('To-Do', header_text)
+        self.assertIn('작업 목록 시작', header_text)
 
         # 작업 추가
         inputbox = self.browser.find_element_by_id('id_new_item')
@@ -38,6 +38,8 @@ class NewVisitorTest(LiveServerTestCase): #1
         # (취미는 날치 잡이용 그물 만들기)
         inputbox.send_keys('공작깃털 사기')
         inputbox.send_keys(Keys.ENTER)
+        edith_list_url = self.browser.current_url
+        self.assertRegex(edith_list_url, '/lists/.+')
         self.check_for_row_in_list_table('1: 공작깃털 사기')
         
         # 추가 아이템을 입력할 수 있는 여분의 텍스트 상자 존재
@@ -49,9 +51,35 @@ class NewVisitorTest(LiveServerTestCase): #1
         self.check_for_row_in_list_table('2: 공작깃털을 이용해서 그물 만들기')
         self.check_for_row_in_list_table('1: 공작깃털 사기')
 
-        self.fail('Finish the test!')
+        # self.fail('Finish the test!')
 
-        # 페이지 리로딩, 아이템 2개 목록에 출력
+        # 새로운 사용자인 프란시스가 사이트에 접속한다
+
+        ## 새로운 브라우저 세션을 이용해서 에디스의 정보가
+        ## 쿠키를 통해 유입되는 것을 방지한다 (## meta 주석)
+        self.browser.quit()
+        self.browser = webdriver.Chrome(executable_path='/Users/ymkim/Downloads/chromedriver')
+
+        # 프란시스가 홈페이지에 접속하며, 에디스의 리스트는 보이지 않음.
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('공작깃털 사기', page_text)
+        self.assertNotIn('그물 만들기', page_text)
+
+        # 프란시스가 새로운 작업 아이템을 입력하기 시작
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('우유 사기')
+        inputbox.send_keys(Keys.ENTER)
+
+        # 프란시스가 전용 URL을 취득한다.
+        francis_list_url = self.browser.current_url
+        self.assertRegex(edith_list_url, '/lists/.+')
+        self.assertNotEqual(francis_list_url, edith_list_url)
+
+        # 에디스가 입력한 흔적이 없는걸 다시 확인
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('공작깃털 사기', page_text)
+        self.assertIn('우유 사기', page_text)
 
 # if __name__ == '__main__':
 #    unittest.main(warnings='ignore')
